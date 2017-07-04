@@ -3,7 +3,6 @@ build/
 
 # elm-package generated files
 elm-stuff
-*.css
 
 # elm-repl generated files
 repl-temp-*
