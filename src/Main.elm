@@ -2,7 +2,7 @@ module Main exposing (..)
 
 import Html exposing (Html, Attribute, small, div, ul, label, span, li, a, input, button, text)
 import Html.Attributes exposing (..)
-import Html.Events exposing (on, onInput, onClick, keyCode)
+import Html.Events exposing (on, onInput, onClick, onBlur, onDoubleClick, keyCode)
 import Tuple exposing (first, second)
 import Json.Decode as Json
 
@@ -23,6 +23,7 @@ type alias Task =
     { id : Int
     , description : String
     , isComplete : Bool
+    , isEditing : Bool
     }
 
 
@@ -63,6 +64,7 @@ taskInit id description =
     { id = id
     , description = description
     , isComplete = False
+    , isEditing = False
     }
 
 
@@ -73,6 +75,8 @@ taskInit id description =
 type Msg
     = DescriptionChange String
     | Add
+    | EditingTask Int Bool
+    | UpdateTask Int String
     | ApplyFilter String
     | ToggleStatus Int Bool
     | ToggleAll
@@ -97,6 +101,26 @@ update msg model =
                         model.tasks ++ [ taskInit model.uid model.description ]
                 , checkAll = False
             }
+
+        EditingTask id isEditing ->
+          let
+            setTaskEditState t =
+              if t.id == id then
+                { t | isEditing = isEditing }
+              else
+                t
+          in
+            { model | tasks = List.map setTaskEditState model.tasks }
+
+        UpdateTask id desc ->
+          let
+            updateDesc t =
+              if t.id == id then
+                { t | description = desc }
+              else
+                t
+          in
+            { model | tasks = List.map updateDesc model.tasks }
 
         ApplyFilter filter ->
             { model | visibilityFilter = filter }
@@ -124,7 +148,6 @@ update msg model =
             { model | tasks = List.filter (\t -> not t.isComplete) model.tasks }
 
 
-
 -- VIEW
 
 
@@ -142,7 +165,7 @@ view model =
     in
         div [ id "task-app", class "center-contents flex-column" ]
             [ div [ class "flex-row" ]
-                [ viewTickbox " " model.checkAll [ onClick ToggleAll ]
+                [ viewTickbox model.checkAll [ onClick ToggleAll ]
                 , viewInputBox model
                 ]
             , div [] [ viewTasks model ]
@@ -192,17 +215,24 @@ filterTasks filter task =
 
 viewTaskItem : Task -> Html Msg
 viewTaskItem task =
-    li [ class "list-item", id ("task-" ++ toString task.id) ]
-        [ viewTickbox task.description task.isComplete [ onClick (ToggleStatus task.id (not task.isComplete)) ]
+    li [ class "list-item", classList [("editing", task.isEditing)], id ("task-" ++ toString task.id) ]
+        [ viewTickbox task.isComplete [ onClick (ToggleStatus task.id (not task.isComplete)) ]
+        , span [ class "task-text", onDoubleClick (EditingTask task.id True) ] [ text task.description ]
+        , input [ type_ "text"
+                , class "task-edit-input"
+                , value task.description
+                , onEnter (EditingTask task.id False)
+                , onBlur (EditingTask task.id False)
+                , onInput (UpdateTask task.id)
+                ] []
         , button [ type_ "button", class "button-icon rounded primary", style [ ( "margin-left", "auto" ) ], onClick (DeleteOne task.id) ] [ text "X" ]
         ]
 
 
-viewTickbox : String -> Bool -> List (Attribute Msg) -> Html Msg
-viewTickbox str ticked attrs =
+viewTickbox : Bool -> List (Attribute Msg) -> Html Msg
+viewTickbox ticked attrs =
     label [ class "tickbox" ]
         [ input ([ type_ "checkbox", checked ticked ] ++ attrs) []
-        , span [] [ text str ]
         ]
 
 

@@ -321,3 +321,16 @@ a.button-link.active {
    #task-list {
      padding-left: 0;
    }
+
+.task-text {
+  display: inline-flex;
+  align-items: center;
+}
+
+.task-edit-input,
+.editing .task-text {
+  display: none;
+}
+.editing .task-edit-input {
+  display: block;
+}
