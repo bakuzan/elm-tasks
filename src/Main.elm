@@ -1,6 +1,6 @@
 module Main exposing (..)
 
-import Html exposing (Html, Attribute, div, ul, label, span, li, a, input, text)
+import Html exposing (Html, Attribute, small, div, ul, label, span, li, a, input, button, text)
 import Html.Attributes exposing (..)
 import Html.Events exposing (on, onInput, onClick, keyCode)
 import Tuple exposing (first, second)
@@ -13,6 +13,8 @@ main =
         , view = view
         , update = update
         }
+
+
 
 -- MODEL
 
@@ -29,12 +31,13 @@ type alias Model =
     , description : String
     , tasks : List Task
     , visibilityFilter : String
+    , checkAll : Bool
     }
 
 
 model : Model
 model =
-    Model 3 "" initStartTasks "all"
+    Model 3 "" initStartTasks "all" False
 
 
 initStartTasks : List Task
@@ -72,6 +75,9 @@ type Msg
     | Add
     | ApplyFilter String
     | ToggleStatus Int Bool
+    | ToggleAll
+    | DeleteOne Int
+    | DeleteComplete
 
 
 update : Msg -> Model -> Model
@@ -89,6 +95,7 @@ update msg model =
                         model.tasks
                     else
                         model.tasks ++ [ taskInit model.uid model.description ]
+                , checkAll = False
             }
 
         ApplyFilter filter ->
@@ -96,13 +103,26 @@ update msg model =
 
         ToggleStatus id isCompleted ->
             let
-               updateEntry t =
-                   if t.id == id then
-                       { t | isComplete = isCompleted }
-                   else
-                       t
+                updateEntry t =
+                    if t.id == id then
+                        { t | isComplete = isCompleted }
+                    else
+                        t
             in
                 { model | tasks = List.map updateEntry model.tasks }
+
+        ToggleAll ->
+            { model
+                | checkAll = not model.checkAll
+                , tasks = List.map (\t -> { t | isComplete = not model.checkAll }) model.tasks
+            }
+
+        DeleteOne id ->
+            { model | tasks = List.filter (\t -> t.id /= id) model.tasks }
+
+        DeleteComplete ->
+            { model | tasks = List.filter (\t -> not t.isComplete) model.tasks }
+
 
 
 -- VIEW
@@ -110,11 +130,28 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    div [ class "center-contents flex-column" ]
-        [ viewInputBox model
-        , div [] [ viewTasks model ]
-        , viewFilters model.visibilityFilter
-        ]
+    let
+        hasCompleted =
+            List.any (\t -> t.isComplete) model.tasks
+
+        tasksLeft =
+            List.length (List.filter (\t -> not t.isComplete) model.tasks)
+
+        tasksComplete =
+            (List.length model.tasks) - tasksLeft
+    in
+        div [ id "task-app", class "center-contents flex-column" ]
+            [ div [ class "flex-row" ]
+                [ viewTickbox " " model.checkAll [ onClick ToggleAll ]
+                , viewInputBox model
+                ]
+            , div [] [ viewTasks model ]
+            , div [ class "spaced-contents" ]
+                [ small [ id "task-count" ] [ text ((toString tasksLeft) ++ " left") ]
+                , viewFilters model.visibilityFilter
+                , button [ type_ "button", class "button-link", classList [ ( "hidden", not hasCompleted ) ], onClick DeleteComplete ] [ text ("clear completed (" ++ (toString tasksComplete) ++ ")") ]
+                ]
+            ]
 
 
 viewInputBox : Model -> Html Msg
@@ -139,49 +176,60 @@ taskFilter : String -> Task -> Bool
 taskFilter filter =
     filterTasks filter
 
+
 filterTasks : String -> Task -> Bool
 filterTasks filter task =
     case filter of
-         "active" ->
-             not task.isComplete
+        "active" ->
+            not task.isComplete
 
-         "complete" ->
-             task.isComplete
+        "complete" ->
+            task.isComplete
 
-         _ ->
+        _ ->
             True
+
 
 viewTaskItem : Task -> Html Msg
 viewTaskItem task =
     li [ class "list-item", id ("task-" ++ toString task.id) ]
-        [ label [ class "list-item__checkbox tickbox" ]
-            [ input [ type_ "checkbox", checked task.isComplete, onClick (ToggleStatus task.id (not task.isComplete)) ] []
-            , span [] [ text task.description ]
-            ]
+        [ viewTickbox task.description task.isComplete [ onClick (ToggleStatus task.id (not task.isComplete)) ]
+        , button [ type_ "button", class "button-icon rounded primary", style [ ( "margin-left", "auto" ) ], onClick (DeleteOne task.id) ] [ text "X" ]
+        ]
+
+
+viewTickbox : String -> Bool -> List (Attribute Msg) -> Html Msg
+viewTickbox str ticked attrs =
+    label [ class "tickbox" ]
+        [ input ([ type_ "checkbox", checked ticked ] ++ attrs) []
+        , span [] [ text str ]
         ]
 
 
 viewFilters : String -> Html Msg
 viewFilters filter =
     div [ class "filters" ]
-       [ visibilityFilter "all" filter
-       , text " "
-       , visibilityFilter "active" filter
-       , text " "
-       , visibilityFilter "complete" filter
-       ]
+        [ visibilityFilter "all" filter
+        , text " "
+        , visibilityFilter "active" filter
+        , text " "
+        , visibilityFilter "complete" filter
+        ]
 
-visibilityFilter: String -> String -> Html Msg
+
+visibilityFilter : String -> String -> Html Msg
 visibilityFilter filter activeFilter =
-    a [ href ("#/" ++ filter), classList [("selected", filter == activeFilter)], onClick (ApplyFilter filter) ]
-      [ text (capitalise filter) ]
+    a [ href ("#/" ++ filter), classList [ ( "selected", filter == activeFilter ) ], onClick (ApplyFilter filter) ]
+        [ text (capitalise filter) ]
 
 
-capitalise: String -> String
+capitalise : String -> String
 capitalise str =
-  (String.left 1 str
-      |> String.toUpper) ++
-  String.slice 1 (String.length str) str
+    (String.left 1 str
+        |> String.toUpper
+    )
+        ++ String.slice 1 (String.length str) str
+
 
 onEnter : Msg -> Attribute Msg
 onEnter msg =

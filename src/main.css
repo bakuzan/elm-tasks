@@ -1,163 +1,323 @@
-  body {
-    background: #fff;
-    font-size: 16px;
-    font-family: Consolas, "monospace";
-  }
 
-  .center-contents {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
+   body {
+     background: #fff;
+     font-size: 16px;
+     font-family: Consolas, "monospace";
+   }
+   #root > div {
+      display: flex;
+      width: 400px;
+      max-width: 100vw;
+      margin: 0 auto;
+   }
+   #task-app > div {
+     width: 100%;
+   }
+   .hidden {
+     visibility: hidden;
+   }
+   .center-contents {
+     display: flex;
+     justify-content: center;
+     align-items: center;
+   }
+   .spaced-contents {
+     display: flex;
+     justify-content: space-around;
+     align-items: center;
+   }
+   .flex-row {
+     display: flex;
+     flex-direction: row;
+   }
+   .flex-column {
+     display: flex;
+     flex-direction: column;
+   }
 
-  .flex-column {
-    display: flex;
-    flex-direction: column;
-  }
 
-  .has-float-label {
-display: -webkit-box;
-display: -ms-flexbox;
-display: flex;
-position: relative;
+   .has-float-label {
+ display: -webkit-box;
+ display: -ms-flexbox;
+ display: flex;
+ position: relative;
 }
 .has-float-label label, .has-float-label > span {
-position: absolute;
-left: 5px;
-top: 1px;
-cursor: text;
-font-size: .75em;
-opacity: 1;
--webkit-transition: all .2s;
-transition: all .2s;
+ position: absolute;
+ left: 5px;
+ top: 1px;
+ cursor: text;
+ font-size: .75em;
+ opacity: 1;
+ -webkit-transition: all .2s;
+ transition: all .2s;
 }
 .has-float-label select {
--webkit-appearance: none;
--moz-appearance: none;
-appearance: none;
+ -webkit-appearance: none;
+ -moz-appearance: none;
+ appearance: none;
 }
 .has-float-label input, .has-float-label select {
-font-size: inherit;
-padding: 0 .5em;
-padding-top: 1em;
-margin-bottom: 2px;
-border: 0;
-border-radius: 0;
-border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+ font-size: inherit;
+ padding: 0 .5em;
+ padding-top: 1em;
+ margin-bottom: 2px;
+ border: 0;
+ border-radius: 0;
+ border-bottom: 2px solid rgba(0, 0, 0, 0.1);
 }
 .has-float-label input::-webkit-input-placeholder, .has-float-label select::-webkit-input-placeholder {
-opacity: 1;
--webkit-transition: all .2s;
-transition: all .2s;
+ opacity: 1;
+ -webkit-transition: all .2s;
+ transition: all .2s;
 }
 .has-float-label input:placeholder-shown:not(:focus)::-webkit-input-placeholder, .has-float-label select:placeholder-shown:not(:focus)::-webkit-input-placeholder {
-opacity: 0;
+ opacity: 0;
 }
 .has-float-label input:placeholder-shown:not(:focus) + *:not(.input-has-content), .has-float-label select:placeholder-shown:not(:focus) + *:not(.input-has-content) {
-font-size: 1.3em;
-opacity: .5;
-pointer-events: none;
-top: .25em;
-left: .5em;
+ font-size: 1.3em;
+ opacity: .5;
+ pointer-events: none;
+ top: .25em;
+ left: .5em;
 }
 .has-float-label input:focus, .has-float-label select:focus {
-outline: none;
-border-color: rgba(0, 0, 0, 0.5);
+ outline: none;
+ border-color: rgba(0, 0, 0, 0.5);
 }
 .has-float-label.input-list-container input {
-padding-bottom: 0.3em;
+ padding-bottom: 0.3em;
 }
 .has-float-label.input-list-container input:placeholder-shown:not(:focus) + *:not(.input-has-content) {
-font-size: 1.3em;
-opacity: .5;
-pointer-events: none;
-top: 1em;
+ font-size: 1.3em;
+ opacity: .5;
+ pointer-events: none;
+ top: 1em;
 }
 .has-float-label.select-container::after {
-content: "\2335";
-position: absolute;
-top: 50%;
-right: 5px;
--webkit-transform: translateY(-50%);
-        transform: translateY(-50%);
-font-weight: bold;
-pointer-events: none;
+ content: "\2335";
+ position: absolute;
+ top: 50%;
+ right: 5px;
+ -webkit-transform: translateY(-50%);
+         transform: translateY(-50%);
+ font-weight: bold;
+ pointer-events: none;
 }
 
+
+
 .tickbox {
-display: -webkit-box;
-display: -ms-flexbox;
-display: flex;
--webkit-box-pack: start;
-    -ms-flex-pack: start;
-        justify-content: flex-start;
--webkit-box-align: center;
-    -ms-flex-align: center;
-        align-items: center;
-padding: 2px;
-cursor: pointer;
+ display: -webkit-box;
+ display: -ms-flexbox;
+ display: flex;
+ -webkit-box-pack: start;
+     -ms-flex-pack: start;
+         justify-content: flex-start;
+ -webkit-box-align: center;
+     -ms-flex-align: center;
+         align-items: center;
+ padding: 2px;
+ cursor: pointer;
 }
 .tickbox input[type="checkbox"] {
--webkit-appearance: none;
-   -moz-appearance: none;
-        appearance: none;
--webkit-transition: all 0.3s;
-transition: all 0.3s;
-position: relative;
-display: -webkit-box;
-display: -ms-flexbox;
-display: flex;
--webkit-box-pack: center;
-    -ms-flex-pack: center;
-        justify-content: center;
--webkit-box-align: center;
-    -ms-flex-align: center;
-        align-items: center;
-width: 20px;
-height: 20px;
-margin: 0 5px;
+ -webkit-appearance: none;
+    -moz-appearance: none;
+         appearance: none;
+ -webkit-transition: all 0.3s;
+ transition: all 0.3s;
+ position: relative;
+ display: -webkit-box;
+ display: -ms-flexbox;
+ display: flex;
+ -webkit-box-pack: center;
+     -ms-flex-pack: center;
+         justify-content: center;
+ -webkit-box-align: center;
+     -ms-flex-align: center;
+         align-items: center;
+ width: 20px;
+ height: 20px;
+ margin: 0 5px;
 }
 
 .tickbox input:before,
 .tickbox input:checked:before {
-color: #000;
--webkit-transition: all 0.3s;
-transition: all 0.3s;
-cursor: pointer;
-z-index: 1;
+ color: #000;
+ -webkit-transition: all 0.3s;
+ transition: all 0.3s;
+ cursor: pointer;
+ z-index: 1;
 }
 
 .tickbox input:before {
-content: "\2610";
-font-size: 2em;
+ content: "\2610";
+ font-size: 2em;
 }
 
 .tickbox input:disabled:before {
-content: "\274c";
-font-size: 1em;
-color: #444;
+ content: "\274c";
+ font-size: 1em;
+ color: #444;
 }
 
 .tickbox input:checked:before {
-content: "\2611";
-color: #0f0;
+ content: "\2611";
+ color: #0f0;
 }
 
-  ul {
-    list-style-type: none;
-    padding: 5px;
-    margin: 5px 0;
-  }
 
-  input[type="text"] {
-    width: 300px;
-    max-width: 100%;
-  }
+   ul {
+     list-style-type: none;
+     padding: 5px;
+     margin: 5px 0;
+     width: 100%;
+   }
+   .list-item {
+     display: flex;
+     width: 100%;
+   }
 
-  input[type="checkbox"]:checked + span {
-    text-decoration: line-through;
-  }
 
-  .filters > .selected {
-    color: #ccc;
-  }
+
+.button, .button-link, .button-icon {
+ -webkit-appearance: none;
+    -moz-appearance: none;
+         appearance: none;
+ display: -webkit-box;
+ display: -ms-flexbox;
+ display: flex;
+ -webkit-box-pack: center;
+     -ms-flex-pack: center;
+         justify-content: center;
+ -webkit-box-align: center;
+     -ms-flex-align: center;
+         align-items: center;
+ background-color: inherit;
+ color: inherit;
+ padding: 5px;
+ border: none;
+ white-space: nowrap;
+ cursor: pointer;
+}
+.button.rounded, .button-link.rounded, .button-icon.rounded {
+ border-radius: 5px;
+}
+.button.depress, .button-link.depress, .button-icon.depress {
+ box-shadow: 0 0 5px #0f0f0f;
+}
+.button.depress:active, .button-link.depress:active, .button-icon.depress:active {
+ box-shadow: inset 0px 0px 5px #0f0f0f;
+}
+.button:disabled, .button-link:disabled, .button-icon:disabled {
+ background-color: #ccc !important;
+ color: #666 !important;
+ cursor: default;
+}
+
+.button {
+ min-width: 100px;
+ min-height: 25px;
+ text-decoration: none;
+}
+.button:hover {
+ background-color: #f2f2f2;
+}
+
+.button-link {
+ color: #CE414A;
+ text-decoration: underline;
+}
+.button-link:focus, .button-link:active {
+ color: #CE414A;
+}
+.button-link:hover {
+ color: #7E7E86;
+}
+
+.button-icon {
+ -webkit-box-flex: 0;
+     -ms-flex: 0 1 0%;
+         flex: 0 1 0%;
+ padding: 3px 6px;
+ margin: 2px 5px;
+}
+.button-icon:before {
+ content: attr(icon);
+ font-size: 1.5rem;
+}
+.button-icon:before:not(:disabled) {
+ cursor: pointer;
+}
+.button-icon.small:before {
+ font-size: 0.8rem;
+}
+
+.button.primary, .button-icon.primary {
+ background-color: #850512;
+ color: #E1E3EF;
+}
+.button.primary:hover, .button-icon.primary:hover {
+ background-color: #cf081c;
+}
+
+.button-link.primary {
+ color: #850512;
+}
+.button-link.primary:focus, .button-link.primary:active {
+ color: #850512;
+}
+.button-link.primary:hover {
+ color: #6c040f;
+}
+
+a.button-link.active {
+ text-decoration: none;
+ color: #E1E3EF;
+}
+
+.button.secondary {
+ background-color: #CE414A;
+ color: #7E7E86;
+}
+.button.secondary:hover {
+ background-color: #9b282f;
+}
+
+.button-group {
+ display: -webkit-box;
+ display: -ms-flexbox;
+ display: flex;
+ -ms-flex-pack: distribute;
+     justify-content: space-around;
+ padding: 5px;
+ margin: 5px 0;
+}
+.button-group.centered {
+ -webkit-box-pack: center;
+     -ms-flex-pack: center;
+         justify-content: center;
+}
+
+
+
+   input[type="text"] {
+     width: 300px;
+     max-width: 100%;
+   }
+
+   input[type="checkbox"]:checked + span {
+     text-decoration: line-through;
+   }
+
+   .filters > .selected {
+     color: #ccc;
+   }
+
+   #task-count {
+     color: #999;
+   }
+
+   #task-list {
+     padding-left: 0;
+   }
