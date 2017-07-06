@@ -1,17 +1,21 @@
 module Main exposing (..)
 
+import Dom
 import Html exposing (Html, Attribute, small, div, ul, label, span, li, a, input, button, text)
 import Html.Attributes exposing (..)
 import Html.Events exposing (on, onInput, onClick, onBlur, onDoubleClick, keyCode)
+import Html.Keyed as Keyed
 import Tuple exposing (first, second)
 import Json.Decode as Json
+import Task
 
-
+main : Program Never Model Msg
 main =
-    Html.beginnerProgram
-        { model = model
+    Html.program
+        { init = init
         , view = view
         , update = update
+        , subscriptions = \_ -> Sub.none
         }
 
 
@@ -35,6 +39,9 @@ type alias Model =
     , checkAll : Bool
     }
 
+init : ( Model, Cmd Msg )
+init =
+     model ! []
 
 model : Model
 model =
@@ -73,7 +80,8 @@ taskInit id description =
 
 
 type Msg
-    = DescriptionChange String
+    = NoOp
+    | DescriptionChange String
     | Add
     | EditingTask Int Bool
     | UpdateTask Int String
@@ -84,11 +92,15 @@ type Msg
     | DeleteComplete
 
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
     case msg of
+        NoOp ->
+          model ! []
+
         DescriptionChange newContent ->
             { model | description = newContent }
+            ! []
 
         Add ->
             { model
@@ -101,6 +113,7 @@ update msg model =
                         model.tasks ++ [ taskInit model.uid model.description ]
                 , checkAll = False
             }
+            ! []
 
         EditingTask id isEditing ->
           let
@@ -109,8 +122,12 @@ update msg model =
                 { t | isEditing = isEditing }
               else
                 t
+
+            focus =
+              Dom.focus ("task-input-" ++ toString id)
           in
             { model | tasks = List.map setTaskEditState model.tasks }
+            ! [ Task.attempt (\_ -> NoOp) focus ]
 
         UpdateTask id desc ->
           let
@@ -121,9 +138,11 @@ update msg model =
                 t
           in
             { model | tasks = List.map updateDesc model.tasks }
+            ! []
 
         ApplyFilter filter ->
             { model | visibilityFilter = filter }
+            ! []
 
         ToggleStatus id isCompleted ->
             let
@@ -134,19 +153,22 @@ update msg model =
                         t
             in
                 { model | tasks = List.map updateEntry model.tasks }
+                ! []
 
         ToggleAll ->
             { model
                 | checkAll = not model.checkAll
                 , tasks = List.map (\t -> { t | isComplete = not model.checkAll }) model.tasks
             }
+            ! []
 
         DeleteOne id ->
             { model | tasks = List.filter (\t -> t.id /= id) model.tasks }
+            ! []
 
         DeleteComplete ->
             { model | tasks = List.filter (\t -> not t.isComplete) model.tasks }
-
+            ! []
 
 -- VIEW
 
@@ -188,11 +210,11 @@ viewInputBox model =
 viewTasks : Model -> Html Msg
 viewTasks model =
     let
-        liItems =
-            List.map viewTaskItem (List.filter (taskFilter model.visibilityFilter) model.tasks)
+        keyedLiItems =
+          List.map (\t -> ((toString t.id), viewTaskItem t)) (List.filter (taskFilter model.visibilityFilter) model.tasks)
     in
-        ul [ id "task-list" ]
-            ([] ++ liItems)
+        Keyed.ul [ id "task-list" ]
+                 keyedLiItems
 
 
 taskFilter : String -> Task -> Bool
@@ -219,6 +241,7 @@ viewTaskItem task =
         [ viewTickbox task.isComplete [ onClick (ToggleStatus task.id (not task.isComplete)) ]
         , span [ class "task-text", onDoubleClick (EditingTask task.id True) ] [ text task.description ]
         , input [ type_ "text"
+                , id ("task-input-" ++ toString task.id)
                 , class "task-edit-input"
                 , value task.description
                 , onEnter (EditingTask task.id False)
